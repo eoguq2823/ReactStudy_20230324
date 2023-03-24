@@ -5,7 +5,6 @@ export const style = css`
     top: 0;
     left: 0;
     z-index: 99;
-    
     width: 300px;
     height: 100%;
 `;

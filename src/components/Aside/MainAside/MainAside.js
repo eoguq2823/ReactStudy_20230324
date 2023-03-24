@@ -8,19 +8,29 @@ import { HiHome } from 'react-icons/hi';
 import { GrTest } from 'react-icons/gr';
 import { BsCardChecklist } from 'react-icons/bs';
 import { BiListCheck } from 'react-icons/bi';
-
+import { AiFillHome } from 'react-icons/ai';
+import { useNavigate } from 'react-router-dom';
+import { FaUsers } from 'react-icons/fa';
 
 
 const MainAside = () => {
+    const navigate = useNavigate();
+
     return (
         <aside css={S.style}>
         <Navigation
-            // you can use your own router's api to get pathname
-            activeItemId="/management/members"
+            activeItemId="/"
             onSelect={({itemId}) => {
-                console.log(itemId)
+                navigate(itemId);
+                // console.log(itemId) //확인
+                // window.location.href = itemId;
             }}
             items={[
+                {
+                    title: 'Home',
+                    itemId: '/',
+                    elemBefore: () => <AiFillHome />
+                },
                 {
                     title: 'T1',
                     itemId: '/t1',
@@ -33,13 +43,25 @@ const MainAside = () => {
                 },
                 {
                     title: 'Sample',
-                    itemId: '/sample',
+                    itemId: '/sample/input/1',
                     elemBefore: () => <BsCardChecklist />,
                     subNav: [
                         {
                             title: 'input',
                             itemId: '/sample/input/1',
                             elemBefore: () => <BiListCheck />    
+                        }
+                    ]
+                },
+                {
+                    title: 'List',
+                    itemId: '/users',
+                    elemBefore: () => <BsCardChecklist />,
+                    subNav: [
+                        {
+                            title: '사용자 전체 조회',
+                            itemId: '/users',
+                            elemBefore: () => <FaUsers />    
                         }
                     ]
                 },
