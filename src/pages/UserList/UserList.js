@@ -1,28 +1,32 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useRef, useState } from 'react';
-import * as S from './style'
+import * as S from './style';
 
 const UserList = () => {
     //요소가 랜더링되어졌을때 실행되어지는 곳입니다.
     useEffect(() => {
-        console.log("컴포넌트 렌더링")
-    }, []); 
+        console.log("컴포넌트 렌더링");
+    }, []);
 
     const user = {
         id: 0,
         username: '',
         password: '',
         name: '',
-        email: ''
+        email: '',
+        modifyFlag: false
     }
 
-    const [Inputs, setInputs] = useState(user);
-    const inputRefs = [useRef(), useRef(), useRef(), useRef(),];
+    const userIndex = useRef(1);
+                        /* 1-1 빈배열을 만들어 입력받아 넣겠다.*/
+    const [users, setUsers] = useState([]);//추가1번
+    const [inputs, setInputs] = useState(user);
+    const inputRefs = [useRef(), useRef(), useRef(), useRef()];
     const addButtonRef = useRef();
 
     const inputHandler = (e) => {
         const { name, value } = e.target;
-        setInputs({...Inputs, [name]: value})
+        setInputs({...inputs, [name]: value});
     }
 
     const keyupHandler = (e) => {
@@ -39,45 +43,58 @@ const UserList = () => {
             }
         }
     }
-
+    //추가2번
     const addHandler = () => {
-        
+        const user = {
+            ...inputs
+        };
+
+        user.id = userIndex.current++;
+
+        setUsers([...users, user]);
     }
 
-    const users = [
-        {
-            id: 1,
-            username: 'aaa',
-            passowrd: '1234',
-            name: 'AAA',
-            email: 'aaa@gmail.com'
-        },
-        {
-            id: 2,
-            username: 'bbb',
-            passowrd: '1234',
-            name: 'BBB',
-            email: 'bbb@gmail.com'
-        },
-        {   
-            id: 3,
-            username: 'ccc',
-            passowrd: '1234',
-            name: 'CCC',
-            email: 'ccc@gmail.com'
-        }
-    ]
+    const onRemove = (index) => {
+        // users.splice(index - 1, 1);
+        // setUsers([...users]);
+        
+        setUsers(users.filter(user => user.id !== index));
+    }
 
-    const userIndex = useRef(4);
+    const onModify = (index) => {
+        setUsers(users.map(user => {
+            if(user.id === index) {
+                setInputs({...user});
+                user.modifyFlag = true;
+            }else {
+                user.modifyFlag = false;
+            }
+            return user;
+        }));
+    }
+
+    const onSave = (index) => {
+        setUsers(users.map(user => {
+            if(user.id === index) {
+                user.modifyFlag = true;
+                return {
+                    ...inputs,
+                    id: user.id
+                };
+            }
+            return user;
+        }));
+    }
+
 
     return (
         <div css={S.Container}>
             <div>
-                <input type="text" onKeyUp={keyupHandler} onClick={inputHandler} placeholder='username' name='username' value={0} ref={inputRefs[0]}/>
-                <input type="text" onKeyUp={keyupHandler} onClick={inputHandler} placeholder='password' name='password' value={0} ref={inputRefs[1]}/>
-                <input type="text" onKeyUp={keyupHandler} onClick={inputHandler} placeholder='name' name='name' value={0} ref={inputRefs[2]}/>
-                <input type="text" onKeyUp={keyupHandler} onClick={inputHandler} placeholder='email' name='email' value={0} ref={inputRefs[3]}/>
-                <button type="button" onClick={addHandler} ref={addButtonRef}>추가</button>
+                <input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='username' name='username' ref={inputRefs[0]}/>
+                <input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='password' name='password' ref={inputRefs[1]}/>
+                <input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='name' name='name' ref={inputRefs[2]}/>
+                <input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='email' name='email' ref={inputRefs[3]}/>
+                <button type='button' onClick={addHandler} ref={addButtonRef}>추가</button>
             </div>
             <table css={S.Table}>
                 <thead>
@@ -87,21 +104,32 @@ const UserList = () => {
                         <th css={S.ThAndTd}>password</th>
                         <th css={S.ThAndTd}>name</th>
                         <th css={S.ThAndTd}>email</th>
+                        <th css={S.ThAndTd}>update</th>
+                        <th css={S.ThAndTd}>delete</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {/* map = 키, 밸류 
+                    List에서는 인덱스와 값 */}
                     {users.map(user => {
-                        
-                        userIndex.current += 1;
 
-                    return ( 
-                        <tr>
-                            <td css={S.ThAndTd}>{user.id}</td>
-                            <td css={S.ThAndTd}>{user.username}</td>
-                            <td css={S.ThAndTd}>{user.passowrd}</td>
-                            <td css={S.ThAndTd}>{user.name}</td>
-                            <td css={S.ThAndTd}>{user.email}</td>
-                        </tr>
+                        return (
+                            <tr key={user.id}>
+                                <td css={S.ThAndTd}>{user.id}</td>
+                                <td css={S.ThAndTd}>{user.modifyFlag ? (<input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='username' name='username' ref={inputRefs[0]} defaultValue={user.username} />) : user.username}</td>
+                                <td css={S.ThAndTd}>{user.modifyFlag ? (<input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='password' name='password' ref={inputRefs[1]} defaultValue={user.password} />) : user.password}</td>
+                                <td css={S.ThAndTd}>{user.modifyFlag ? (<input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='name' name='name' ref={inputRefs[2]} defaultValue={user.name} />) : user.name}</td>
+                                <td css={S.ThAndTd}>{user.modifyFlag ? (<input type="text" onKeyUp={keyupHandler} onChange={inputHandler} placeholder='email' name='email' ref={inputRefs[3]} defaultValue={user.email} />) : user.email}</td>
+                                <td css={S.ThAndTd}>
+                                    {user.modifyFlag 
+                                        ? (<button onClick={() => onSave(user.id)}>확인</button>)
+                                        : (<button onClick={() => onModify(user.id)}>수정</button>) 
+                                    }
+                                </td>
+                                <td css={S.ThAndTd}>
+                                    <button onClick={() => onRemove(user.id)}>삭제</button>    
+                                </td>
+                            </tr>
                         );
                     })}
                 </tbody>
