@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
-import Icon from "awesome-react-icons/lib/cjs/Icon";
 import { Navigation } from "react-minimal-side-navigation/lib";
 import 'react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css';
 import * as S from './Style'
@@ -64,6 +63,11 @@ const MainAside = () => {
                             elemBefore: () => <FaUsers />    
                         }
                     ]
+                },
+                {
+                    title: 'ToDoList',
+                    itemId: '/ToDo',
+                    elemBefore: () => <BsCardChecklist />,
                 },
         ]}
         />
